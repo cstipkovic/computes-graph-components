@@ -22,6 +22,7 @@ void imprimeGrafo(Vertice G[], int ordem);
 void criaGrafo(Vertice **G, int ordem);
 int  acrescentaAresta(Vertice G[], int ordem, int v1, int v2);
 int  calculaTamanho(Vertice G[], int ordem);
+int contaComponenets(Vertice G[], int ordem);
 
 void criaGrafo(Vertice **G, int ordem) {
 	int i;
@@ -83,25 +84,63 @@ void imprimeGrafo(Vertice G[], int ordem){
 	printf("\n\n");
 }
 
+// Conta o numero de componentes em um grafo
+int contaComponenets(Vertice G[], int ordem) {
+	int numeroComponentes = 0;
+	int i;
+
+	// percorre cada vetor do grafo
+	for (i = 0; i < ordem; i++) {
+		// Acrescenta e marca o primeiro 
+		// vetor como o primeiro componente
+		if (G[i].componente == 0) {
+			numeroComponentes++;
+			G[i].componente = numeroComponentes;
+		}
+
+		Aresta *aux = G[i].prim;
+		// Passa por todas as arestas adjacentes
+		for ( ; aux != NULL; aux = aux->prox) {
+			// Se a aresta nao tiver componente (estiver com 0)
+			// ela recebe o numero do componente no qual
+			// foi referenciada pela primeira vez na lista de 
+			// adjacencia
+			if (G[aux->nome].componente == 0) {
+				G[aux->nome].componente = numeroComponentes;
+			}
+		}
+	}
+
+	printf("\nNumero componentes: %d\n", numeroComponentes);
+
+	return numeroComponentes;
+}
 
 int main(int argc, char *argv[]) {
 	Vertice *G;
-	int ordemG = 5;
-		
-	criaGrafo(&G, ordemG);
-	acrescentaAresta(G,ordemG,0,1);
-	acrescentaAresta(G,ordemG,0,3);
-	acrescentaAresta(G,ordemG,3,1);
-	acrescentaAresta(G,ordemG,2,4);
+	int ordemG = 8;
 	
-/*	acrescentaAresta(G,ordemG,3,4);
+	criaGrafo(&G, ordemG);
+
+	// Teste 1
+	// acrescentaAresta(G,ordemG,0,1);
+	// acrescentaAresta(G,ordemG,0,3);
+	// acrescentaAresta(G,ordemG,3,1);
+	// acrescentaAresta(G,ordemG,2,4);
+	
+	// Teste 2
+	acrescentaAresta(G,ordemG,3,4);
 	acrescentaAresta(G,ordemG,4,2);
 	acrescentaAresta(G,ordemG,5,4);
 	acrescentaAresta(G,ordemG,2,3);
 	acrescentaAresta(G,ordemG,3,7);
-*/
-	
+
+	// Chamada da funcao que retorna o numero de
+	// componentes no grafo
+	contaComponenets(G, ordemG);
+
 	imprimeGrafo(G, ordemG);
+
     system("PAUSE");
 	return 0;
 }
