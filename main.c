@@ -1,3 +1,7 @@
+// Clauber Pereira Stipkovic Halic - 3124304-5
+// Alden M. F. Barbosa - 4132505-2
+// Maurício Eidi Saijo Araki - 3156627-8
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -18,11 +22,11 @@ typedef struct vert {
 	Aresta *prim;
 } Vertice;
 
-void imprimeGrafo(Vertice G[], int ordem);
 void criaGrafo(Vertice **G, int ordem);
-int  acrescentaAresta(Vertice G[], int ordem, int v1, int v2);
-int  calculaTamanho(Vertice G[], int ordem);
+int acrescentaAresta(Vertice G[], int ordem, int v1, int v2);
+int calculaTamanho(Vertice G[], int ordem);
 int contaComponenets(Vertice G[], int ordem);
+void imprimeGrafo(Vertice G[], int ordem);
 
 void criaGrafo(Vertice **G, int ordem) {
 	int i;
@@ -54,7 +58,7 @@ int acrescentaAresta(Vertice G[], int ordem, int v1, int v2) {
 	return 1;
 }
 
-int  calculaTamanho(Vertice G[], int ordem) {
+int calculaTamanho(Vertice G[], int ordem) {
 	int i;
 	int totalArestas = 0;
 	
@@ -66,6 +70,39 @@ int  calculaTamanho(Vertice G[], int ordem) {
 	}
 
 	return totalArestas / 2 + ordem;
+}
+
+// Funcao que conta e imprime o numero de 
+// componentes em um grafo
+int contaComponenets(Vertice G[], int ordem) {
+	int numeroComponentes = 0;
+	int i;
+
+	// percorre cada vetor do grafo
+	for (i = 0; i < ordem; i++) {
+		// Acrescenta e marca o primeiro 
+		// vetor como o primeiro componente
+		// do grafo
+		if (G[i].componente == 0) {
+			numeroComponentes++;
+			G[i].componente = numeroComponentes;
+		}
+
+		Aresta *aux = G[i].prim;
+		// Passa por todos os vetores adjacentes ao que esta
+		// sendo consultado na lista de adjacencia
+		for ( ; aux != NULL; aux = aux->prox) {
+			// Se a vetor nao tiver um componente associado
+			// (estiver com 0) ele recebe o numero do componente 
+			// no qual foi referenciada pela primeira vez na 
+			// lista de adjacencia
+			if (G[aux->nome].componente == 0) {
+				G[aux->nome].componente = numeroComponentes;
+			}
+		}
+	}
+
+	return numeroComponentes;
 }
 
 void imprimeGrafo(Vertice G[], int ordem){
@@ -84,60 +121,32 @@ void imprimeGrafo(Vertice G[], int ordem){
 	printf("\n\n");
 }
 
-// Conta o numero de componentes em um grafo
-int contaComponenets(Vertice G[], int ordem) {
-	int numeroComponentes = 0;
-	int i;
-
-	// percorre cada vetor do grafo
-	for (i = 0; i < ordem; i++) {
-		// Acrescenta e marca o primeiro 
-		// vetor como o primeiro componente
-		if (G[i].componente == 0) {
-			numeroComponentes++;
-			G[i].componente = numeroComponentes;
-		}
-
-		Aresta *aux = G[i].prim;
-		// Passa por todas as arestas adjacentes
-		for ( ; aux != NULL; aux = aux->prox) {
-			// Se a aresta nao tiver componente (estiver com 0)
-			// ela recebe o numero do componente no qual
-			// foi referenciada pela primeira vez na lista de 
-			// adjacencia
-			if (G[aux->nome].componente == 0) {
-				G[aux->nome].componente = numeroComponentes;
-			}
-		}
-	}
-
-	printf("\nNumero componentes: %d\n", numeroComponentes);
-
-	return numeroComponentes;
-}
-
 int main(int argc, char *argv[]) {
 	Vertice *G;
-	int ordemG = 8;
+	int ordemG = 5;
 	
 	criaGrafo(&G, ordemG);
 
 	// Teste 1
-	// acrescentaAresta(G,ordemG,0,1);
-	// acrescentaAresta(G,ordemG,0,3);
-	// acrescentaAresta(G,ordemG,3,1);
-	// acrescentaAresta(G,ordemG,2,4);
+	acrescentaAresta(G,ordemG,0,1);
+	acrescentaAresta(G,ordemG,0,3);
+	acrescentaAresta(G,ordemG,3,1);
+	acrescentaAresta(G,ordemG,2,4);
 	
 	// Teste 2
-	acrescentaAresta(G,ordemG,3,4);
-	acrescentaAresta(G,ordemG,4,2);
-	acrescentaAresta(G,ordemG,5,4);
-	acrescentaAresta(G,ordemG,2,3);
-	acrescentaAresta(G,ordemG,3,7);
+	// acrescentaAresta(G,ordemG,3,4);
+	// acrescentaAresta(G,ordemG,4,2);
+	// acrescentaAresta(G,ordemG,5,4);
+	// acrescentaAresta(G,ordemG,2,3);
+	// acrescentaAresta(G,ordemG,3,7);
 
 	// Chamada da funcao que retorna o numero de
-	// componentes no grafo
-	contaComponenets(G, ordemG);
+	// componentes do grafo.
+	//
+	// Colocamos a funcao aqui para que na imprimieGrafo o campo
+	// Comp (componente) já apareca preenchido, ou seja, 
+	// diferente de 0.
+	printf("\nNumero de componentes: %d\n", contaComponenets(G, ordemG));
 
 	imprimeGrafo(G, ordemG);
 
